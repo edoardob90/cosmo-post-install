@@ -62,45 +62,54 @@ function install_nas_packages {
 
 function setup_nas_homes {
     if [[ ${NAS_CONFIGURATION} != 'ok' && ${INSTALL_NAS_PACKAGE} == 'ok' ]]; then
+        
         # The actual setup
         echo_message info 'Setting up LDAP auth files...'
         echo_message warning 'Requires root privileges'
+        
         # File '/etc/ntp.conf'
         echo_message info 'File "ntp.conf"'
         echo "server 128.178.23.1" | superuser_do 'tee -a /etc/ntp.conf'
+        
         # File '/etc/ldap.conf'
         echo_message info 'Configuring file "ldap.conf"'
         echo -e "timelimit 30\nbind_timelimit 30\nidle_timelimit 1200\nbind_policy soft\n nss_initgroups backlink\nnss_map_attribute uniqueMember memberUid\n" | superuser_do tee -a /etc/ldap.conf
         IGNORE=$(awk -F: '{printf ("%s,",$1)}' /etc/passwd)
         echo "nss_initgroups_ignoreusers ${IGNORE%,}" | superuser_do 'tee -a /etc/ldap.conf'
+        
         # File '/etc/nsswitch.conf'
         echo_message info 'File "nsswitch.conf"'
         superuser_do 'sed -i "s/compat/files ldap/" /etc/nsswitch.conf'
         echo -e "automount: files\n" | superuser_do 'tee -a /etc/nsswitch.conf'
+        
         # File '/etc/idmapd.conf'
         echo_message info 'File "idmapd.conf"'
         echo -e "Domain = INTRANET\nLocal-Realms = epfl@INTRANET,epfl,epfl.ch\n" | superuser_do 'tee -a /etc/idmapd.conf'
+        
         # File '/etc/nslcd.conf'
         echo_message info 'Configure nscd daemon'
         echo -e "bind_timelimit 30\ntimelimit 30\nidle_timelimit 1200" | superuser_do 'tee -a /etc/nslcd.conf'
         superuser_do service nscd restart
+        
         # Enabling login from other users
         if [[ "$LATEST_LTS" == 'no' ]]; then
             echo_message info 'Enabling login from other users'
             echo -e "[SeatDefaults]\ngreeter-show-manual-login=true\ngreeter-hide-users=true" | superuser_do 'tee /etc/lightdm/lightdm.conf'
         fi
+        
         # Done with LDAP
         echo_message success 'Done with LDAP.'
+        
         # Setup autofs
         echo_message info 'Setting up automount & autofs ...'
         superuser_do 'mkdir -p /etc/auto.master.d'
         echo -e "/home /etc/auto.home --timeout 3600\n" | superuser_do 'tee -a /etc/auto.master'
         echo -e "/- /etc/auto.cosmo --timeout 3600\n" | superuser_do 'tee -a /etc/auto.master'
+        
         # There is an error if the rule '+auto.master' is present
-        if grep -q "^+auto.master" /etc/auto.master; then
-            echo_message warning "Commenting out '+auto.master' otherwise it will cause problems"
-            superuser_do 'sed -i -e "s/^\(+auto\.master\)/#\1/" /etc/auto.master'
-        fi
+        echo_message warning "Commenting out '+auto.master' otherwise it will cause problems"
+        superuser_do 'sed -i -e "s/^\(+auto\.master\)/#\1/" /etc/auto.master'
+        
         # Creating map files
         echo_message info 'Creating map files for home folders and COSMO workspaces'
         echo "/apps -fstype=nfs4,rw,defaults,noatime,proto=tcp,auto,port=2049,nosuid,soft cosmonas1.epfl.ch:/volume1/cosmo-apps" | superuser_do 'tee /etc/auto.cosmo'
@@ -108,6 +117,7 @@ function setup_nas_homes {
         echo "/workspace -fstype=nfs,soft,intr,rsize=8192,wsize=8192,nosuid,tcp sti2files.epfl.ch:/sti_cosmo_1_files_nfs/workspace" | superuser_do 'tee -a /etc/auto.cosmo'
         echo_message success 'Done. Restarting AutoFS...'
         superuser_do 'service autofs restart'
+        
         # Permissions on scratch and local home
         echo_message info 'Changing permissions to local scratch folder and home'
         if [[ ! -d "/local/scratch" ]]; then
@@ -117,14 +127,16 @@ function setup_nas_homes {
             # 1777 octal means: rwx for everyone PLUS sticky bit
             superuser_do 'chmod -R 1777 /local/scratch'
         fi
-        # Why local home should be accessed by everyone?
-        #if [[ -d "/local/home" ]]; then
-        #    superuser_do chgrp COSMO-unit /local/home
-        #fi
+        # Local home directory
+        if [[ ! -d "/local/home/local" ]]; then
+            superuser_do 'mkdir -p /local/home/local'
+        else
+            superuser_do 'sed -i -e "s|^\(local.*:\)/home/local\(:.*\)|\1/local/home/local\2|" /etc/passwd'
+        fi
         echo_message success 'Configuration done.'
         NAS_CONFIGURATION='ok'
     else
-        whiptail --title "ERROR" --msgbox "Possible causes:\n (1) Did you install necessary packages?\n (2) Don't run twice this action!" 8 56
+        whiptail --title "ERROR" --msgbox "Possible causes:\n (1) Did you install necessary packages?\n (2) You cannot run this action twice!" 8 56
         system_configure
     fi
 }
