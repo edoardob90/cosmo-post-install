@@ -3,22 +3,20 @@ COSMO Post Install Script
 
 ### Important notes
 
-1. Until the end of July ([tentative](https://wiki.ubuntu.com/BionicBeaver/ReleaseSchedule)) Ubuntu **16.04** won't be officially offered a migration to the next LTS release (**18.04**). A new temporary branch (`1804LTS`) is progressively been updated to reflect packages' changes & related stuff until the two releases coexist.
-If you are setting up a new machine with Ubuntu 18.04 installed from scratch, please **be aware** that some apps could not be installed (yet the new version of the script will handle those few cases).
+#### Ubuntu 'bionic' (18.04 LTS)
 
-Packages that are known to **not** be available in Ubuntu **18.04** (mostly in [`data/favs-dev`](/data/favs-dev.list)):
+This branch is the most up-to-date regarding packages renamed/changed/removed in Ubuntu 18.04. If you are fresh-installing it, please **clone & checkout** `updating` branch. When ready, all the small adjustments here will be merged in `master`.
 
-Ubuntu 16.04 | Ubuntu 18.04
------------- | ------------
-`libpng12-dev` |`libpng-dev`
-`libgd2-dev` | `libgd-dev`
-`liblua5.1-dev` | `liblua5.2-dev`
+~~If you are setting up a new machine with Ubuntu 18.04 installed from scratch, please **be aware** that some apps could not be installed (yet the new version of the script will handle those few cases).~~
 
 You **are free to modify by hand** the `data/*.list` file(s) to reflect these changes, until the temporary branch is merged when the official upgrade will be offered.
 
-2. The script has been **globally reformatted**, following the updates of the [original project](https://github.com/snwh/ubuntu-post-install). Now the script is now much more flexible and it is much easier to add new features.
+#### Script reformat
 
----
+The script has been **globally reformatted**, following the updates of the [original project](https://github.com/snwh/ubuntu-post-install). Now the script is now much more flexible and it is much easier to add new features.
+
+
+### What is this?
 
 A semi-automatic and interactive set of post-installation scripts for Ubuntu and its derivatives. You can use this project to install your favourite apps, set your preferred settings, and do minor housekeeping.
 
