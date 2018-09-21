@@ -17,11 +17,11 @@ libnetcdf-dev
 libopenmpi-dev
 openmpi-bin
 libjpeg-dev
-libpng12-dev
+libpng-dev
 libcairo2-dev
 libedit-dev
-libgd2-dev
-liblua5.1-dev
+libgd-dev
+liblua5.2-dev
 libpango1.0-dev
 libqt4-dev
 libwxgtk3.0-dev
