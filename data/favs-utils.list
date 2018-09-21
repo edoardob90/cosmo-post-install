@@ -1,5 +1,6 @@
 dconf-tools
 openssh-server
+openssh-client
 p7zip-full
 ppa-purge
 rsync
@@ -10,9 +11,9 @@ synaptic
 vim
 valgrind
 geany
-python
-python-numpy
-python-scipy
+python3
+python3-numpy
+python3-scipy
 idle
 pymol
 units
@@ -20,11 +21,9 @@ gnuplot-x11
 tcl8.5-dev
 openjdk-8-jdk
 icedtea-8-plugin
-flashplugin-installer
 mplayer
 unrar
 subversion
-compizconfig-settings-manager
 meld
 sshfs
 tmux

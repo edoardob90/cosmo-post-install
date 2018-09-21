@@ -14,9 +14,10 @@ function install_snap_apps {
 			--ok-button "Install" \
 			--cancel-button "Go Back" \
 			$LINES $COLUMNS $(( $LINES - 12 )) \
+			'install_snap_slack'        'Slack' \
+            'install_snap_telegram'     'Telegram' \
 			'install_snap_atom'         'Atom' \
 			'install_snap_inkscape'     'Inkscape' \
-			'install_snap_slack'        'Slack' \
 			'install_snap_spotify'      'Spotify' \
 			'install_snap_sublime'      'Sublime Text 3' \
 			3>&1 1>&2 2>&3)
@@ -42,6 +43,10 @@ function install_snap_apps {
 				# install Sublime Text
 				install_snap_package "Sublime Text 3" "sublime-text" install_snap_apps
 				;;
+            install_snap_telegram)
+                # Telegram Desktop
+                install_snap_package "Telegram Desktop" "telegram-desktop" install_snap_apps
+                ;;
 			*) 
 				# cancel
 				echo_message info "Returning..."
