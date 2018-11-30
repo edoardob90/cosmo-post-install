@@ -8,8 +8,9 @@ function install_insync {
     # Add Insync repository first
     echo_message info "Adding $NAME repository for current release"
     CODENAME=$(lsb_release -cs)
-    DISTRO=$(lsb_release -ds | tr '[:upper:]' '[:lower:]' | cut -d' ' -f1)
-    echo "deb http://apt.insynchq.com/$DISTRO $CODENAME non-free contrib" | superuser_do 'tee /etc/apt/sources.list.d/insync.list'
+    # The following fixes a crash in case the distro is Pop!_OS, which is based on Ubuntu (https://pop.system76.com/docs/difference-between-pop-ubuntu/)
+    DISTRO=$(lsb_release -si | tr '[:upper:]' '[:lower:]')
+    echo "deb http://apt.insynchq.com/${DISTRO} ${CODENAME} non-free contrib" | superuser_do 'tee /etc/apt/sources.list.d/insync.list'
     echo_message info "Installing $NAME"
     superuser_do 'apt-get update'
     install_package $NAME "insync" install_thirdparty
